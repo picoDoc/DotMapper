@@ -56,7 +56,7 @@ def save_tile(img, tiles_path, zoom, x,y):
     define_tile(zoom, x, y)
     print 'Saved {0}'.format(fn)
 
-def main(tiles_path, db_file, groups):
+def main(tiles_path, db_file, groups, zoom_levels):
     merc = GlobalMercator()
 
     # Set-up the output db
@@ -64,7 +64,7 @@ def main(tiles_path, db_file, groups):
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
 
-    for zoom in [5,6,7,8,9,10,11,12,13]: #TODO zoom levels
+    for zoom in [zoom_levels]: #TODO zoom levels
         results_set = c.execute("select x, y, quadkey, group_type from people_by_group order by quadkey asc, rand asc" )
         use_ellipse, radius_rel, gamma, os_scale = STYLE[zoom]
         radius = os_scale*radius_rel/4/2
@@ -132,4 +132,5 @@ if __name__=='__main__':
 
     main(settings['tiles_path'],
          settings['db_filename'],
-         settings['groups'])
+         settings['groups'],
+         settings['zoom_levels'])

@@ -7,7 +7,7 @@ A complete system for producing Google maps-enabled pure client-side dot maps, b
 
 http://projects.andrewwhitby.com/uk-ethnicity-map
 
-Based on code from Dustin A. Cooper, who adapted it from a similar project by Brandon Martin-Anderson from the MIT Media Lab.
+Based on code from Dustin A. Cable, who adapted it from a similar project by Brandon Martin-Anderson from the MIT Media Lab.
 
 Usage
 -----
