@@ -1,0 +1,2 @@
+- Make client-side tile index more compressed representation
+- Support multiple color schemes in one file

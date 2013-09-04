@@ -1,0 +1,68 @@
+{
+    "zoom_levels": [5,6,7,8,9,10,11,12,13],
+
+    "attr_path" : "attributes",
+    "shapes_path" : "boundaries+attributes",
+    "db_filename" : "db/points.db",
+    "tiles_path" : "out/tiles",
+    "template_path" : "html",
+    "out_path" : "out",
+
+    "attr_id_field" : "geography code",
+    "shape_id_field" : "OA11CD",
+
+    "attr_skip_lines" : 0,
+
+    "attr_filters": {
+        "Rural Urban" : "Total"
+    },
+
+    "groups": {
+        "g_white" : {
+            "field" : "Ethnic Group: White; measures: Value",
+            "desc" : "White",
+            "color" : "#73B2FF",
+            "order" : 1
+         },
+        "g_mixed" : {
+            "field" : "Ethnic Group: Mixed; measures: Value",
+            "desc" : "Mixed",
+            "color" : "#996633",
+            "order" : 2
+         },
+        "g_asian" : {
+            "field" : "Ethnic Group: Asian; measures: Value",
+            "desc" : "Asian",
+            "color" : "red",
+            "order" : 3
+         }, 
+        "g_black" : {
+            "field" : "Ethnic Group: Black; measures: Value",
+            "desc" : "Black",
+            "color" : "rgb(159,212,0)",
+            "order" : 4
+         },
+        "g_other" : {
+            "field" : "Ethnic Group: Other; measures: Value",
+            "desc" : "Other",
+            "color" : "black",
+            "order" : 5
+         }
+    },
+
+    "client" : {
+        "url" : "http://projects.andrewwhitby.com/uk-ethnicity-map",
+        "title" : "UK Ethnicity Map: One Dot Per Person",
+        "apikey" : "ENTER YOUR GOOGLE MAPS API KEY HERE",
+        "legend_title" : "2011 UK Census Ethnicity",
+        "legend_subtitle" : "1 dot per person (except Scotland)",
+        "info_url" : "http://andrewwhitby.com/2013/09/04/uk-ethnicity-map/",
+        "tiles_path" : "tiles",
+        "head_filename" : "head.txt",
+        "branding_filename" : "branding.txt",
+        "sharing_filename" : "sharing.txt",
+        "start_lat" : 52.8,
+        "start_lon" : -2.2,
+        "start_zoom" : 6
+    }
+}

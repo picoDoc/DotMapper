@@ -1,0 +1,1 @@
+<a href="">By A Person</a>, <a href = "http://projects.andrewwhitby.com/uk-ethnicity-map">based on Andrew Whitby&apos;s UK dot map</a> | <a href="http://stamen.com">Reference data by Stamen Design</a><a href="http://openstreetmap.org"> &amp; OpenStreetMap</a>.

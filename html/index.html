@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>$title</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta name="og:url" content="" />
+<meta name="og:title" content="$title" />
+<style type="text/css">
+  html { height: 100%; }
+  body { height: 100%; margin: 0; padding: 0 }
+  h1 { font-size: 12pt; }
+  h2 { font-size: 10pt; }
+  a,a:link,a:visited,a:active {color:#246BB2; text-decoration:none;}
+  a:hover {text-decoration:underline;}
+  #map_canvas { height: 100% }
+  .button {
+    cursor:pointer;
+    padding:8px;
+    font-size:small;
+    color: white;
+    font-weight: bold;
+    background-color:#3d94f6;
+    display:inline-block;
+    text-align: 'center';
+  }
+  .button:hover {
+    background-color:#1e62d0;
+  }
+</style>
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=${apikey}&sensor=false">
+</script>
+
+<script type="text/javascript">
+
+// An object containing the index of existing tiles
+var defined_tiles = $_defined_tiles;
+
+// Check whether a tile exists
+function tileExists(coord, zoom) {
+  if (zoom.toString() in defined_tiles) {
+    if (coord.x.toString() in defined_tiles[zoom]) {
+      if (defined_tiles[zoom][coord.x].indexOf(coord.y) > -1) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Create an object representing a gmaps layer
+function LayerOptions(base_url, name, blank_tile_url, opacity) {
+  this.getTileUrl = function(coord, zoom) {
+    if (tileExists(coord, zoom)) {
+      return base_url+"/"+zoom+"/"+coord.x+"/"+coord.y+".png";
+    } else {
+      return blank_tile_url;
+    }
+  },
+
+  this.tileSize = new google.maps.Size(256, 256),
+  this.maxZoom  = $_zoom_max,
+  this.minZoom  = $_zoom_min,
+  this.name     = name,
+  this.opacity  = opacity
+}
+
+// Create the various maps layers
+var refOptions = new Array();
+
+refOptions[0] = new LayerOptions(
+  "http://tile.stamen.com/toner-labels",
+  "Roads and boundaries",
+  "blank.png",
+  0.35);
+
+refOptions[1] = new LayerOptions(
+  "http://tile.stamen.com/toner-lines",
+  "Roads and boundaries",
+  "blank.png",
+  0.35);
+
+var blackOptions = new LayerOptions(
+  "$tiles_path/black",
+  "One dot per person",
+  "blank.png",
+  1.0);
+
+var colorOptions = new LayerOptions(
+  "$tiles_path",
+  "One dot per person",
+  "blank.png",
+  1.0);
+
+var refMap = new Array()
+refMap[0] = new google.maps.ImageMapType(refOptions[0]);
+refMap[1] = new google.maps.ImageMapType(refOptions[1]);
+var colorMap = new google.maps.ImageMapType(colorOptions);
+var blackMap = new google.maps.ImageMapType(blackOptions);
+
+var map;
+var legendTable;
+
+// Starting defaults
+var lat = $start_lat;
+var lon = $start_lon;
+var zoom = $start_zoom;
+
+var fBlack = false;
+var fRefs = false;
+var fHide = false;
+
+function setViewportFromArgs(){
+  var urlhash = window.location.hash;
+  if( urlhash != "" ){
+    urlhash = urlhash.substring(1); //remove the hash 
+    var parts = urlhash.split("&");
+
+    var coord = {};
+    for(var i=0; i<parts.length; i++){
+      var keyval = parts[i].split("=");
+      if(keyval[0]==="lat" || keyval[0]==="lon") {
+        coord[keyval[0]] = parseFloat(keyval[1]);
+      } else if(keyval[0]==="z"){
+        coord.z = parseInt(keyval[1]);
+      } else if(keyval[0]==="o"){
+        coord.o = keyval[1]; 
+      } else if(keyval[0]==="bw"){
+        if(keyval[1]=="1"){
+          fBlack = true
+        } else {
+          fBlack = false        
+        }
+      } else if(keyval[0]==="refs"){
+        if(keyval[1]=="1"){
+          fRefs = true
+        } else {
+          fRefs = false        
+        }
+      } else if(keyval[0]==="hide"){
+        if(keyval[1]=="1"){
+          fHide = true
+        } else {
+          fHide = false        
+        }
+      }
+    }
+    if( coord.lat && coord.lon ){
+      lat = coord.lat;
+      lon = coord.lon;
+    }
+    if( coord.z ){
+      zoom = coord.z;
+    }
+    if( coord.o ){
+      labels = coord.o==="t";
+    }
+  }
+}
+
+var aHideableControls = Array();
+
+function showLegend(fShow) {
+  if (fShow) {
+    legendTable.style.display = 'block';
+  } else {
+    legendTable.style.display = 'none';
+  }
+}
+
+function buildBlackControl(map) {
+  var blackControlDiv = document.createElement('div');
+  aHideableControls.push(blackControlDiv);
+  blackControlDiv.style.padding = '10px';
+
+  var controlUI = document.createElement('div');
+  controlUI.setAttribute("class", "button");
+  controlUI.style.width = '130px';
+  controlUI.style.height = '15px';
+  controlUI.style.cursor = 'pointer';
+  controlUI.style.textAlign = 'center';
+  controlUI.title = 'Click to add or remove racial color-coding';
+  blackControlDiv.appendChild(controlUI);
+
+  var controlText = document.createElement('div');
+  controlText.style.fontFamily = 'Arial,sans-serif';
+  controlText.style.fontSize = '12px';
+  controlText.innerHTML = 'Remove color coding';
+
+  controlUI.appendChild(controlText);
+
+  function showBlackControl(f) {
+    if (f) {
+      map.mapTypes.set('black', blackMap);
+      map.setMapTypeId('black');
+      controlText.innerHTML = 'Add color coding';
+      showLegend(!f);
+    }else{
+      map.mapTypes.set('dot', colorMap);
+      map.setMapTypeId('dot');
+      controlText.innerHTML = 'Remove color coding';
+      showLegend(!f);
+    }
+  }
+
+  google.maps.event.addDomListener(controlUI, 'click', function() {
+    fBlack = !fBlack;
+    showBlackControl(fBlack);
+  });
+
+  blackControlDiv.index = 1;
+  map.controls[google.maps.ControlPosition.LEFT_TOP].push(blackControlDiv);
+  showBlackControl(fBlack);
+}
+
+
+function buildRefsControl(map) {
+  var refsControlDiv = document.createElement('div');
+  aHideableControls.push(refsControlDiv);
+  refsControlDiv.style.padding = '10px';
+
+  var controlUI = document.createElement('div');
+  controlUI.setAttribute("class", "button");
+  controlUI.style.width = '130px';
+  controlUI.style.height = '15px';
+  controlUI.style.cursor = 'pointer';
+  controlUI.style.textAlign = 'center';
+  controlUI.title = 'Click to add or remove map labels and streets';
+  refsControlDiv.appendChild(controlUI);
+
+  var controlText = document.createElement('div');
+  controlText.style.fontFamily = 'Arial,sans-serif';
+  controlText.style.fontSize = '12px';
+  controlText.innerHTML = 'Add Map Labels';
+  controlUI.appendChild(controlText);
+
+  function showRefsControl(f) {
+    if(f){
+	  if (map.overlayMapTypes.length == 0) {
+        map.overlayMapTypes.push( refMap[0] );
+        map.overlayMapTypes.push( refMap[1] );
+      }
+      controlText.innerHTML = 'Remove map labels';      
+    }else{
+      while (map.overlayMapTypes.length > 0)
+        map.overlayMapTypes.pop();
+      controlText.innerHTML = 'Add map labels';      
+    }	
+  }
+
+  google.maps.event.addDomListener(controlUI, 'click', function() {
+    fRefs = !fRefs;
+    showRefsControl(fRefs);
+  });
+
+  refsControlDiv.index = 1;
+  map.controls[google.maps.ControlPosition.LEFT_TOP].push(refsControlDiv);
+  showRefsControl(fRefs);
+}
+
+function roundToPlace(x,places){
+  return Math.round(x*Math.pow(10,places))/Math.pow(10,places);
+}
+
+
+function buildClipControl(map) {
+  var clipControlDiv = document.createElement('div');
+  aHideableControls.push(clipControlDiv);
+  clipControlDiv.style.padding = '10px';
+
+  var controlUI = document.createElement('div');
+  controlUI.setAttribute("class", "button");
+  controlUI.style.width = '130px';
+  controlUI.style.height = '15px';
+  controlUI.title = 'Click to display current view link';
+  clipControlDiv.appendChild(controlUI);
+
+  var controlText = document.createElement('div');
+  controlText.style.fontFamily = 'Arial,sans-serif';
+  controlText.style.fontSize = '12px';
+  controlText.innerHTML = 'Link to this view';
+
+  controlUI.appendChild(controlText);
+
+  google.maps.event.addDomListener(controlUI, 'click', function() {
+    ll = map.getCenter();
+    z = map.getZoom();
+    window.location.href = '$url'
+      + '#lat=' + roundToPlace(ll.lat(),6).toString()
+      + '&lon=' + roundToPlace(ll.lng(),6).toString()
+      + '&z=' + z.toString()
+      + '&bw=' + (fBlack ? '1' : '0')
+      + '&refs=' + (fRefs ? '1' : '0')
+      + '&hide=' + (fHide ? '1' : '0');
+  });
+
+  clipControlDiv.index = 1;
+  map.controls[google.maps.ControlPosition.LEFT_TOP].push(clipControlDiv);
+}
+
+
+function buildHideControl(map) {
+  var hideControlDiv = document.createElement('div');
+  hideControlDiv.style.padding = '7px';
+
+  var controlUI = document.createElement('div');
+  controlUI.setAttribute("class", "button");
+  controlUI.style.width = '72px';
+  controlUI.style.height = '10px';
+  controlUI.style.cursor = 'pointer';
+  controlUI.style.textAlign = 'center';
+  controlUI.title = 'Hide or show the map controls and legend';
+  hideControlDiv.appendChild(controlUI);
+
+  var controlText = document.createElement('div');
+  controlText.style.fontFamily = 'Arial,sans-serif';
+  controlText.style.fontSize = '9px';
+  controlText.innerHTML = 'Hide overlays';
+  controlUI.appendChild(controlText);
+
+  function showHideables(f) {
+    if (f) {
+      map.setOptions({disableDefaultUI: true }); 
+      for (i = 0; i < aHideableControls.length; i++) {
+          aHideableControls[i].style.display = 'none';        
+      }
+      controlText.innerHTML = 'Show overlays';      
+    } else {        
+      map.setOptions({disableDefaultUI: false });
+      for (i = 0; i < aHideableControls.length; i++) {
+          aHideableControls[i].style.display = 'block';       
+      }
+      controlText.innerHTML = 'Hide overlays';      
+    } 	
+  }
+
+  google.maps.event.addDomListener(controlUI, 'click', function() {
+    fHide = !fHide;
+    showHideables(fHide);
+  });
+
+  hideControlDiv.index = 1;
+  map.controls[google.maps.ControlPosition.RIGHT_TOP].push(hideControlDiv); 
+  showHideables(fHide);
+}
+
+aLegend = $_legend;
+
+function buildLegendBox(map) {
+  var legendControlDiv = document.createElement('div');
+  aHideableControls.push(legendControlDiv);
+
+  var table = document.createElement('table');
+  legendTable = table;
+
+  for (i = 0; i < aLegend.length; i++) {
+    var tr = document.createElement('tr');
+
+    var tdDesc = document.createElement('td');
+    tdDesc.appendChild(document.createTextNode(aLegend[i].desc));
+    tdDesc.style.fontFamily = 'Arial,Helvetica,sans-serif';
+    tdDesc.style.fontSize = '12px';
+
+    var tdStyle = document.createElement('td');
+    var canvasStyle = document.createElement('canvas');
+    canvasStyle.setAttribute('height', 15);
+    canvasStyle.setAttribute('width', 15);
+    var context=canvasStyle.getContext("2d");
+    context.beginPath();
+    context.arc(canvasStyle.width/2, canvasStyle.height/2, canvasStyle.width/2, 0, 2 * Math.PI, false);
+    context.fillStyle = aLegend[i].color;
+    context.fill();
+    tdStyle.appendChild(canvasStyle);
+
+    tr.appendChild(tdStyle);
+    tr.appendChild(tdDesc);
+
+    table.appendChild(tr);
+  }
+
+  tdDesc.style.fontFamily = 'Arial,Helvetica,sans-serif';
+
+  var title = document.createElement('h1');
+  title.style.fontFamily = 'Arial,Helvetica,sans-serif';    
+  title.innerHTML = "$legend_title";
+  legendControlDiv.appendChild(title);
+
+  var subtitle = document.createElement('h2');
+  subtitle.style.fontFamily = 'Arial,Helvetica,sans-serif';    
+  subtitle.innerHTML = "$legend_subtitle"
+  legendControlDiv.appendChild(subtitle);
+
+  legendControlDiv.appendChild(table);
+
+  var aboutTextDiv = document.createElement('p');
+  aboutTextDiv.style.fontFamily = 'Arial,Helvetica,sans-serif';
+  aboutTextDiv.style.fontSize = '12px';
+  aboutTextDiv.innerHTML = '<a href = "$info_url" style="font-family: Arial,Helvetica,sans-serif; font-size: 12px"><b>"Where&apos;s Scotland?" &amp; other questions&hellip;<b></a>';
+
+  legendControlDiv.appendChild(aboutTextDiv);
+
+  legendControlDiv.style.backgroundColor = 'rgba(255,255,255,0.5)';
+  legendControlDiv.style.paddingLeft = '15px';
+  legendControlDiv.style.paddingRight = '15px';
+  legendControlDiv.style.paddingTop = '5px';
+  legendControlDiv.style.paddingBottom = '15px';
+  legendControlDiv.style.marginRight = '25px';
+  legendControlDiv.index = 1;
+  map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legendControlDiv);    
+}
+
+function buildBranding(map) {
+  var brandControlDiv = document.createElement('div');
+  brandControlDiv.style.padding = '2px';
+  brandControlDiv.style.backgroundColor = 'rgba(255,255,255,0.5)';
+  brandControlDiv.style.textAlign = 'center';
+  brandControlDiv.style.cursor = 'pointer';
+
+  var brandTextDiv = document.createElement('div');
+  brandTextDiv.style.fontFamily = 'Arial,sans-serif';
+  brandTextDiv.style.fontSize = '9px';
+  brandTextDiv.innerHTML = '$_branding';
+  brandControlDiv.appendChild(brandTextDiv);
+
+  brandControlDiv.index = 1;
+  map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(brandControlDiv);
+}
+
+function buildShareControl(map) {
+  var shareControlDiv = document.createElement('div');
+  aHideableControls.push(shareControlDiv);
+
+  var divSharing = document.getElementById('sharing');
+  divSharing.style.display = 'block';
+  shareControlDiv.appendChild(divSharing);
+
+  shareControlDiv.index = 1;
+  map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(shareControlDiv);  
+}
+
+function initialize() {
+  setViewportFromArgs();
+  var myLatlng = new google.maps.LatLng(lat, lon);
+  var mapOptions = {
+    center: myLatlng,
+    zoom: zoom,
+    streetViewControl: false,
+    backgroundColor:"ffffff",
+    mapTypeControl:false,
+    minZoom:5,
+    maxZoom:13
+  };
+
+  map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+  map.mapTypes.set('dot', colorMap);
+  map.setMapTypeId('dot');
+
+  buildBranding(map);
+  buildLegendBox(map);
+  buildBlackControl(map);
+  buildRefsControl(map);
+  buildClipControl(map);
+  buildHideControl(map);
+  buildShareControl(map);
+}
+
+</script>
+
+$_head
+
+</head>
+<body onload="initialize()">
+  <div id="map_canvas" style="position:absolute; width:100%; height:100%; float:left"></div>
+  <div id="sharing" style="padding-bottom: 4px; display: none">
+$_sharing
+  </div>
+</body>
+</html>
