@@ -1,4 +1,4 @@
-DotMapper
+DotMapper (adapted for N.I. grid square census data)
 =========
 
 *__Warning: Here be dragons!__ I'm putting this code up now so people can play with it, but it's definitely not ready for primetime. In particular the database query in dotmap.py is very slow, and if you're working with anything more complex than I was, you'd want to swap it for something else. Also, the black tiles are not generated in any sensible way, although if you use a second settings.json file you can generate them fairly easily. I will hopefully make some of these changes in the next week.*
@@ -25,3 +25,12 @@ Make sure your current working directory is the main project folder.
 To test, enter the 'out' directory and run 'python -mSimpleHTTPServer'. You should be able to connect to http://localhost:8000 and see your map.
 
 This procedure works error-free on the England and Wales data sources described at http://andrewwhitby.com/2013/09/04/uk-ethnicity-map/ , if you need something to get started.
+
+TODO
+----
+
+- more detail on what each settings var is
+- need to init sqlite db
+- make a python requirements file?
+  - ogr stuff
+  - shapely

@@ -23,14 +23,14 @@ A = 1000.0
 STYLE = {
 4 : (False, 1, 153, 8),
 5 : (False, 1, 153, 8),
-6 : (False, 1, 179, 8),
-7 : (False, 1, 179, 8),
-8 : (False, 1, 204, 8),
-9 : (False, 2, 204, 8),
-10 : (False, 2, 230, 8),
-11 : (False, 2, 230, 4),
-12 : (False, 2, 255, 2),
-13 : (False, 1, 255, 1)
+6 : (False, 1, 153, 8),
+7 : (False, 1, 153, 8),
+8 : (False, 1, 153, 8),
+9 : (False, 2, 153, 8),
+10 : (False, 2, 153, 8),
+11 : (False, 2, 153, 4),
+12 : (False, 2, 153, 2),
+13 : (False, 2, 153, 1)
 }
 
 defined_tiles = {}
@@ -64,7 +64,7 @@ def main(tiles_path, db_file, groups, zoom_levels):
     conn = sqlite3.connect(db_file)
     c = conn.cursor()
 
-    for zoom in [zoom_levels]: #TODO zoom levels
+    for zoom in zoom_levels: #TODO zoom levels
         results_set = c.execute("select x, y, quadkey, group_type from people_by_group order by quadkey asc, rand asc" )
         use_ellipse, radius_rel, gamma, os_scale = STYLE[zoom]
         radius = os_scale*radius_rel/4/2

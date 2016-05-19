@@ -4,6 +4,7 @@ import csv
 import json
 import glob
 import convertjson
+from copy import deepcopy
 
 # Main function that reads the shapefile, and reads the attribute data,
 # merges the data back in to the shapefile
@@ -35,12 +36,40 @@ def main(shapes_file_list, attr_file_list, attr_skip_lines,
                     attr[row[attr_id_field]] = a
 
         print "Processed {0} rows in {1}".format(len(attr), attr_filename)
-        
+
+    # in the census data only 100m boxes with over a certain population are listed, so we must infer the rest
+    # here we calculate the infered average population values for unlisted 100m boxes from the listed 1km and 100m boxes
+
+    # for each 1km area init a count of unlisted 100m areas it contains, and census totals
+    unlisted_100m_count = {} # how many 100m boxes are unlisted?
+    totals_1km = {} # people living in these unlisted boxes?
+    for sid,v in attr.iteritems():
+        if len(sid) == 7:
+            unlisted_100m_count[sid] = 100
+            totals_1km[sid] = deepcopy(v)
+
+    # for each 1km area how many people live outside the listed 100m squares?
+    for sid,groups in attr.iteritems():
+        if len(sid) == 9:
+            sid_1km = sid[0:4] + sid[5:8]
+            unlisted_100m_count[sid_1km] -= 1
+            for group in groups:
+                totals_1km[sid_1km][group] -= groups[group]
+
+    # what is the average population per unlisted 100m box inside a given 1km box
+    # TODO values are rounded down to ints, so there is some inaccuracy.  Could be improved
+    unlisted_100m_average = {}
+    for sid,groups in totals_1km.iteritems():
+        unlisted_100m_average[sid] = {}
+        for group, v in groups.iteritems():
+            unlisted_100m_average[sid][group] = v / unlisted_100m_count[sid]
+
+
     # Open and process the shapefiles
-    
+
     for shapes_filename in shapes_file_list:
         ds = ogr.Open(shapes_filename, True)
-    
+
         if ds is None:
             print "Open failed.\n"
             sys.exit( 1 )
@@ -69,7 +98,14 @@ def main(shapes_file_list, attr_file_list, attr_skip_lines,
             if sid in attr:
                 for f in groups:
                     feat.SetField( f, attr[sid][f] )
-                lyr.SetFeature(feat) 
+                lyr.SetFeature(feat)
+            # if the 100m box is not provided in census data, use infered data
+            elif len(sid) == 9:
+                sid_1km = sid[0:4] + sid[5:8]
+                if sid_1km in unlisted_100m_average:
+                    for f in groups:
+                        feat.SetField( f, unlisted_100m_average[sid_1km][f] )
+                    lyr.SetFeature(feat)
     ds = None
 
 
