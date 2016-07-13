@@ -25,12 +25,3 @@ Make sure your current working directory is the main project folder.
 To test, enter the 'out' directory and run 'python -mSimpleHTTPServer'. You should be able to connect to http://localhost:8000 and see your map.
 
 This procedure works error-free on the England and Wales data sources described at http://andrewwhitby.com/2013/09/04/uk-ethnicity-map/ , if you need something to get started.
-
-TODO
-----
-
-- more detail on what each settings var is
-- need to init sqlite db
-- make a python requirements file?
-  - ogr stuff
-  - shapely
