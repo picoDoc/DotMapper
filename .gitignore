@@ -1,1 +1,6 @@
 *.pyc
+attributes/
+boundaries+attributes/
+db/
+out/
+
