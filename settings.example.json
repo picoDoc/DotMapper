@@ -13,7 +13,11 @@
 
     "attr_skip_lines" : 0,
 
-    "attr_filters" : {},
+    "attr_filters" : {
+        "v783_71": {"val": 0, "op": "ge"},
+        "v793_71": {"val": 0, "op": "ge"}
+    },
+
 
     "groups": {
         "g_british" : {

@@ -4,6 +4,7 @@ import csv
 import json
 import glob
 import convertjson
+import operator as op
 from copy import deepcopy
 
 # Main function that reads the shapefile, and reads the attribute data,
@@ -24,7 +25,8 @@ def main(shapes_file_list, attr_file_list, attr_skip_lines,
             attr_reader = csv.DictReader(attr_file)
 
             for row in attr_reader:
-                if all([row[flt] == val for flt, val in attr_filters.items()]):
+                # check if this row passes all the filters
+                if all([getattr(op, val['op'])(type(val['val'])(row[flt]), val['val']) for flt, val in attr_filters.items()]):
                     a = {}
                     for f in groups:
                         if isinstance(groups[f]['field'], list):
