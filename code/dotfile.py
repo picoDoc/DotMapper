@@ -8,6 +8,7 @@ import sqlite3
 import json
 import convertjson
 import glob
+import time
 
 # Import the module that converts spatial data between formats
 
@@ -69,12 +70,15 @@ def main(shapes_file_list, db_file, groups):
         # Iterate through every feature (Census Block Ploygon) in the layer,
         # obtain the population counts, and create a point for each person within
         # that feature.
+        start_time = time.time()
         for j, feat in enumerate( lyr ):
         
             # Print a progress read-out for every 1000 features and export to hard disk
             if j % 1000 == 0:
                 conn.commit()
-                print "%s/%s (%0.2f%%)"%(j+1,n_features,100*((j+1)/float(n_features)))
+                perc_complete = (j+1)/float(n_features)
+                time_left = (1 - perc_complete) * ((time.time() - start_time) / perc_complete)
+                print "%s/%s (%0.2f%%) est. time remaining %0.2f mins"%(j+1,n_features, 100*perc_complete, time_left/60)
             
             # Obtain total population, racial counts, and state fips code of the individual census block
 
