@@ -5,6 +5,7 @@ import json
 import glob
 import convertjson
 import operator as op
+import numpy as np
 from copy import deepcopy
 
 # Main function that reads the shapefile, and reads the attribute data,
@@ -58,14 +59,14 @@ def main(shapes_file_list, attr_file_list, attr_skip_lines,
             for group in groups:
                 totals_1km[sid_1km][group] -= groups[group]
 
+
     # what is the average population per unlisted 100m box inside a given 1km box
     # TODO values are rounded down to ints, so there is some inaccuracy.  Could be improved
     unlisted_100m_average = {}
     for sid,groups in totals_1km.iteritems():
         unlisted_100m_average[sid] = {}
         for group, v in groups.iteritems():
-            unlisted_100m_average[sid][group] = v / unlisted_100m_count[sid]
-
+            unlisted_100m_average[sid][group] = float(v) / unlisted_100m_count[sid]
 
     # Open and process the shapefiles
 
@@ -106,7 +107,8 @@ def main(shapes_file_list, attr_file_list, attr_skip_lines,
                 sid_1km = sid[0:4] + sid[5:8]
                 if sid_1km in unlisted_100m_average:
                     for f in groups:
-                        feat.SetField( f, unlisted_100m_average[sid_1km][f] )
+                        # convert average to a discrete value based on poisson dist.
+                        feat.SetField( f, np.random.poisson(unlisted_100m_average[sid_1km][f]) )
                     lyr.SetFeature(feat)
     ds = None
 
