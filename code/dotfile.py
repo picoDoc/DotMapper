@@ -148,7 +148,7 @@ def main(shapes_file_list, db_file, groups):
                         print "Failed to insert ", x, y, tx, ty, group_type
                         sys.exit(-1)
 
-	    c.execute("create index if not exists i_quadkey on people_by_group(x, y, quadkey, rand, group_type)")
+	c.execute("create index if not exists i_quadkey on people_by_group(x, y, quadkey, rand, group_type)")
         conn.commit()
 
 # Execution code...
