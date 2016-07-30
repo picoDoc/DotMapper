@@ -14,14 +14,7 @@ Usage
 
 Make sure your current working directory is the main project folder.
 
-1. Copy settings.example.json to settings.json and edit as appropriate. This is completely undocumented but hopefully mostly self-explanatory.
-2. Copy your shapefiles to 'boundaries+attributes'.
-3. (optional - only if your shapefiles do not already contain the relevant attributes) Copy your csv-format attribute files to 'attributes'. Run 'python code/shapifyattributes.py'.
-4. Run 'python dotfile.py'.
-5. Run 'python dotmap.py'.
-6. Run 'python generatetileindex.py'
-7. Run 'python makeclient.py'
+Run *generate_dotmap.sh settings.json*, replacing settings.json with your own settings file.  This will run all the python scripts in the *code* directory in the correct order and output a final webpage to the 'out' directory.
 
 To test, enter the 'out' directory and run 'python -mSimpleHTTPServer'. You should be able to connect to http://localhost:8000 and see your map.
 
-This procedure works error-free on the England and Wales data sources described at http://andrewwhitby.com/2013/09/04/uk-ethnicity-map/ , if you need something to get started.
