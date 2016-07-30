@@ -21,14 +21,10 @@ A = 1000.0
 
 # use_ellipse, size, gamma, oversample
 STYLE = {
-4 : (False, 1, 153, 8),
-5 : (False, 1, 153, 8),
-6 : (False, 1, 153, 8),
-7 : (False, 1, 153, 8),
-8 : (False, 1, 153, 8),
-9 : (False, 2, 153, 8),
-10 : (False, 2, 153, 8),
-11 : (False, 2, 153, 4),
+8 :  (False, 2, 153, 5),
+9 :  (False, 2, 153, 4),
+10 : (False, 2, 153, 4),
+11 : (False, 2, 153, 3),
 12 : (False, 2, 153, 2),
 13 : (False, 2, 153, 1)
 }
