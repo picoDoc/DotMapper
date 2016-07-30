@@ -1,0 +1,60 @@
+{
+    "zoom_levels": [5,6,7,8,9,10,11,12,13],
+
+    "attr_path" : "attributes_2011",
+    "shapes_path" : "boundaries+attributes",
+    "db_filename" : "db/points_religion2011.db",
+    "tiles_path" : "out_religion2011/tiles",
+    "template_path" : "html",
+    "out_path" : "out_religion2011",
+
+    "attr_id_field" : "GRIDSQUARE",
+    "shape_id_field" : "GRIDSQ100M",
+
+    "attr_skip_lines" : 0,
+
+    "attr_filters" : {},
+
+    "groups": {
+        "g_prod" : {
+            "field" : ["RELBUP_M_PROT", "RELBUP_F_PROT"],
+            "desc" : "Protestant",
+            "color" : "#2835cc",
+            "order" : 1
+         },
+        "g_cath" : {
+            "field" : ["RELBUP_M_CATH", "RELBUP_F_CATH"],
+            "desc" : "Catholic",
+            "color" : "#77ff32",
+            "order" : 2
+         },
+        "g_other" : {
+            "field" : ["RELBUP_M_OTH", "RELBUP_F_OTH"],
+            "desc" : "Other",
+            "color" : "#ff6f32",
+            "order" : 3
+         }, 
+        "g_none" : {
+            "field" : ["RELBUP_M_NONE", "RELBUP_F_NONE"],
+            "desc" : "None",
+            "color" : "gray",
+            "order" : 4
+         }
+    },
+
+    "client" : {
+        "url" : "http://projects.andrewwhitby.com/uk-ethnicity-map",
+        "title" : "N.I. Religious Community Map: One Dot Per Person",
+        "apikey" : "AIzaSyAClMfPL1XUqBaUZSow6bRDFLHtp6lvxc8",
+        "legend_title" : "2011 N.I. Census Religion",
+        "legend_subtitle" : "1 dot per person",
+        "info_url" : "http://andrewwhitby.com/2013/09/04/uk-ethnicity-map/",
+        "tiles_path" : "tiles",
+        "head_filename" : "head.txt",
+        "branding_filename" : "branding.txt",
+        "sharing_filename" : "sharing.txt",
+        "start_lat" : 54.5,
+        "start_lon" : -6.5,
+        "start_zoom" : 6
+    }
+}

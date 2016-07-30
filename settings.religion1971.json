@@ -1,0 +1,61 @@
+{
+    "zoom_levels": [8,9,10,11,12,13],
+
+    "attr_path" : "attributes_1971",
+    "shapes_path" : "boundaries+attributes",
+    "db_filename" : "db/points_religion1971.db",
+    "tiles_path" : "out_religion1971/tiles",
+    "template_path" : "html",
+    "out_path" : "out_religion1971",
+
+    "attr_id_field" : "gridsq",
+    "shape_id_field" : "GRIDSQ100M",
+
+    "attr_skip_lines" : 0,
+
+    "attr_filters" : {
+        "v783_71": {"val": 0, "op": "ge"}, 
+        "v785_71": {"val": 0, "op": "ge"}, 
+        "v787_71": {"val": 0, "op": "ge"}, 
+        "v789_71": {"val": 0, "op": "ge"}, 
+        "v791_71": {"val": 0, "op": "ge"}, 
+        "v793_71": {"val": 0, "op": "ge"}
+    },
+
+    "groups": {
+        "g_prod" : {
+            "field" : ["v785_71", "v786_71", "v787_71", "v788_71", "v789_71", "v790_71", "v791_71", "v792_71"], 
+            "desc" : "Protestant",
+            "color" : "#2835cc",
+            "order" : 1
+         },
+        "g_cath" : {
+            "field" : ["v783_71", "v784_71"],
+            "desc" : "Catholic",
+            "color" : "#77ff32",
+            "order" : 2
+         },
+        "g_other" : {
+            "field" : ["v793_71", "v794_71"],
+            "desc" : "Other or None",
+            "color" : "gray",
+            "order" : 3
+         } 
+    },
+
+    "client" : {
+        "url" : "http://projects.andrewwhitby.com/uk-ethnicity-map",
+        "title" : "N.I. Religious Community Map: One Dot Per Person",
+        "apikey" : "AIzaSyAClMfPL1XUqBaUZSow6bRDFLHtp6lvxc8",
+        "legend_title" : "1971 N.I. Census Religion",
+        "legend_subtitle" : "1 dot per person",
+        "info_url" : "http://andrewwhitby.com/2013/09/04/uk-ethnicity-map/",
+        "tiles_path" : "tiles",
+        "head_filename" : "head.txt",
+        "branding_filename" : "branding.txt",
+        "sharing_filename" : "sharing.txt",
+        "start_lat" : 54.5,
+        "start_lon" : -6.5,
+        "start_zoom" : 8
+    }
+}
